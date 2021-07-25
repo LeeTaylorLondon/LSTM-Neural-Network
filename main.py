@@ -19,13 +19,16 @@ def explore_data(index=159, range_start=None, range_end=None):
     id_to_word = {value:key for key,value in word_to_id.items()}
 
 
-    if not index_range: print(' '.join(id_to_word[id] for id in x_train[index] ))
+    if not index_range:
+        print(' '.join(id_to_word[id] for id in x_train[index] ))
+        print(f"Sentiment Output: {y_train[index]}")
     else:
         for i in range(range_start, range_end):
             print(' '.join(id_to_word[id] for id in x_train[i]))
+            print(f"Sentiment Output: {y_train[i]}")
 
 
 if __name__ == '__main__':
-    explore_data(159)
+    explore_data(6)
     print()
     explore_data(0, 159, 161)
