@@ -45,14 +45,17 @@ def build_model(opt='SGD'):
     model.add(LSTM(units=128))
     model.add(Dense(units=1, activation='sigmoid'))
     # if verbose: model.summary()
-    model.compile(loss='binary_crossentropy', optimizer=opt)
+    model.compile(loss='binary_crossentropy', optimizer=opt,
+                  metrics=['accuracy'])
     return model
 
 def evaluate_model(model, x, y, xv, yv, verbose=True):
     """ Score model. Params xv & yv = validation set """
     scores = model.fit(x, y, batch_size=128, epochs=10,
                        validation_data=(xv, yv))
-    if verbose: print(scores)
+    if verbose:
+        print(f"Testing Accuracy: {scores.history['accuracy'].pop()}%\n"
+              f"Training Accuracy: {scores.history['accuracy'].pop()}%")
     return scores
 
 if __name__ == '__main__':
@@ -62,5 +65,5 @@ if __name__ == '__main__':
     # explore_data(0, 159, 161)
     x_train_padded, y_train, x_test_padded, y_test = load_data()
     sgd_model = build_model()
-    evaluate_model(sgd_model, x_train_padded, y_train, x_test_padded, y_test)
+    scores = evaluate_model(sgd_model, x_train_padded, y_train, x_test_padded, y_test)
     pass
