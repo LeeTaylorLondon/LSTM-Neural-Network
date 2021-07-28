@@ -1,3 +1,6 @@
+# Author: James Loy
+# Studied & Modified by: Lee Taylor
+
 from tensorflow.keras.datasets import imdb
 from tensorflow.keras.preprocessing import sequence
 from tensorflow.keras.models import Sequential
