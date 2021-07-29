@@ -1,10 +1,11 @@
 # Author: James Loy
 # Studied & Modified by: Lee Taylor
-
 from tensorflow.keras.datasets import imdb
 from tensorflow.keras.preprocessing import sequence
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Embedding, LSTM, Dense
+import tensorflow as tf
+
 
 def explore_data(index=159, range_start=None, range_end=None):
     index_range = False
@@ -52,13 +53,14 @@ def build_model(opt='SGD'):
                   metrics=['accuracy'])
     return model
 
-def evaluate_model(model, x, y, xv, yv, verbose=True):
+def train_test_model(model, data, model_fd=None, verbose=True):
     """ Score model. Params xv & yv = validation set """
+    if not len(data) == 4:
+        raise TypeError('Pass (x_train_p, y_train, x_test_p, y_test) in a tuple.')
+    x, y, xv, yv = data
     scores = model.fit(x, y, batch_size=128, epochs=10,
                        validation_data=(xv, yv))
-    if verbose:
-        print(f"Testing Accuracy: {scores.history['accuracy'].pop()}%\n"
-              f"Training Accuracy: {scores.history['accuracy'].pop()}%")
+    if verbose: print(f"Training Accuracy: {scores.history['accuracy'].pop()}%")
     return scores
 
 if __name__ == '__main__':
@@ -66,7 +68,15 @@ if __name__ == '__main__':
     # explore_data(6)
     # print()
     # explore_data(0, 159, 161)
-    x_train_padded, y_train, x_test_padded, y_test = load_data()
+    """ Train and score model """
+    data_tuple = load_data()
+    # Stochastic gradient descent model
     sgd_model = build_model()
-    scores = evaluate_model(sgd_model, x_train_padded, y_train, x_test_padded, y_test)
+    sgd_scores = train_test_model(sgd_model, data_tuple)
+    # RMSprop optimizer model
+    rmsp_model = build_model('RMSprop')
+    rmsp_scores = train_test_model(rmsp_model, data_tuple)
+    # Adam optimizer model
+    adam_model = build_model('adam')
+    adam_scores = train_test_model(adam_model, data_tuple)
     pass
