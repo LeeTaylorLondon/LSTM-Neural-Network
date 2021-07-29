@@ -54,13 +54,25 @@ def build_model(opt='SGD'):
     return model
 
 def train_test_model(model, data, model_fd=None, verbose=True):
-    """ Score model. Params xv & yv = validation set """
+    """ Pass model and training+testing data for the model to be trained
+    and validated. If a file_directory is passed to this function the weights
+    and whole model is saved, otherwise the model is not saved. """
     if not len(data) == 4:
         raise TypeError('Pass (x_train_p, y_train, x_test_p, y_test) in a tuple.')
     x, y, xv, yv = data
+    cp_callback = None
+    if model_fd is not None:
+        cp_path = 'model_weights_' + model_fd + '/cp.cpkt'
+        cp_callback = tf.keras.callbacks.ModelCheckpoint(
+            filepath=cp_path, save_weights_only=True, verbose=1)
     scores = model.fit(x, y, batch_size=128, epochs=10,
-                       validation_data=(xv, yv))
-    if verbose: print(f"Training Accuracy: {scores.history['accuracy'].pop()}%")
+                       validation_data=(xv, yv), verbose=1,
+                       callbacks=cp_callback)
+    if model_fd is not None:
+        tf.keras.models.save_model(model=model, filepath="model_" + model_fd)
+    if verbose:
+        print(f"Training Accuracy: {scores.history['accuracy'].pop()}%\n"
+              f"Validation Accuracy: {scores.history['val_accuracy'].pop()}")
     return scores
 
 if __name__ == '__main__':
