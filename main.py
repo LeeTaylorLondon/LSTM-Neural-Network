@@ -76,6 +76,7 @@ def train_test_model(model, data, model_fd=None, verbose=True):
     return scores
 
 def load_model(mname) -> tf.keras.Sequential:
+    """ mname should be the optimizer used for the model """
     model = None
     # Try loading model structure and weights from dir
     try:
@@ -127,5 +128,6 @@ if __name__ == '__main__':
     # adam_scores = train_test_model(adam_model, data_tuple)
     """ Load model for testing """
     model = load_model("RMSprop")
-    print(model)
+    x_train_padded, y_train, x_test_padded, y_test = load_data()
+    print(model.evaluate(x_test_padded, y_test))
     pass
