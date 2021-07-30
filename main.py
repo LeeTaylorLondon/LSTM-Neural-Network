@@ -75,20 +75,57 @@ def train_test_model(model, data, model_fd=None, verbose=True):
               f"Validation Accuracy: {scores.history['val_accuracy'].pop()}")
     return scores
 
+def load_model(mname) -> tf.keras.Sequential:
+    model = None
+    # Try loading model structure and weights from dir
+    try:
+        model = tf.keras.models.load_model('model_' + mname)
+    except (OSError, AttributeError):
+        print(f"Encountered ERROR while loading model.\n"
+              f"Building model from saved weights")
+    if model is not None:
+        print("Loaded model from directory '/model_" + mname + "'.")
+        return model
+    # If above fails try building model layers then loading ONLY weights
+    loading_weights_error = False
+    model = Sequential(layers=[Embedding(input_dim = 10000, output_dim = 128),
+                               LSTM(units=128),
+                               Dense(units=1, activation='sigmoid')])
+    model.compile(loss='binary_crossentropy', optimizer=mname,
+                  metrics=['accuracy'])
+    try:
+        model.load_weights("model_weights_" + mname + "/cp.cpkt")
+    except (ImportError, ValueError):
+        loading_weights_error = True
+        print("Encountered ERROR while loading weights.\n"
+              "Ensure module h5py is installed and directory to weights is correct.")
+    if loading_weights_error is False:
+        print("Created model layers and loaded weights.")
+        return model
+    # If all above fails then train a model, store it, and return it
+    print("Loading model and loading weights failed. Proceeding to\n"
+          "build a model, store it and it's weights in /model and /model_weights.")
+    if len(os.listdir('/mnist_data')) != 2:
+        raise TypeError("Cannot execute above. mnist_data folder does not contain training and test data.")
+    return trained_model()
+
 if __name__ == '__main__':
     """ Exploring imdb data """
     # explore_data(6)
     # print()
     # explore_data(0, 159, 161)
     """ Train and score model """
-    data_tuple = load_data()
-    # Stochastic gradient descent model
-    sgd_model = build_model()
-    sgd_scores = train_test_model(sgd_model, data_tuple)
-    # RMSprop optimizer model
-    rmsp_model = build_model('RMSprop')
-    rmsp_scores = train_test_model(rmsp_model, data_tuple)
-    # Adam optimizer model
-    adam_model = build_model('adam')
-    adam_scores = train_test_model(adam_model, data_tuple)
+    # data_tuple = load_data()
+    # # Stochastic gradient descent model
+    # sgd_model = build_model()
+    # sgd_scores = train_test_model(sgd_model, data_tuple)
+    # # RMSprop optimizer model
+    # rmsp_model = build_model('RMSprop')
+    # rmsp_scores = train_test_model(rmsp_model, data_tuple)
+    # # Adam optimizer model
+    # adam_model = build_model('adam')
+    # adam_scores = train_test_model(adam_model, data_tuple)
+    """ Load model for testing """
+    model = load_model("RMSprop")
+    print(model)
     pass
