@@ -103,12 +103,14 @@ def load_model(mname) -> tf.keras.Sequential:
     if loading_weights_error is False:
         print("Created model layers and loaded weights.")
         return model
-    # If all above fails then train a model, store it, and return it
-    print("Loading model and loading weights failed. Proceeding to\n"
-          "build a model, store it and it's weights in /model and /model_weights.")
-    if len(os.listdir('/mnist_data')) != 2:
-        raise TypeError("Cannot execute above. mnist_data folder does not contain training and test data.")
-    return trained_model()
+    raise TypeError(f"Unable to load model and weights, ensure param. 'mname' is correct. "
+                    f"Attempted to load from, model_{mname}.")
+
+def test_model(trained_model, verbose=True):
+    _, _, x_test_padded, y_test = load_data()
+    rv = trained_model.evaluate(x_test_padded, y_test)
+    if verbose: print(f"Testing Accuracy: {round(rv.pop() * 100, 2)}%")
+    return rv
 
 if __name__ == '__main__':
     """ Exploring imdb data """
@@ -127,7 +129,8 @@ if __name__ == '__main__':
     # adam_model = build_model('adam')
     # adam_scores = train_test_model(adam_model, data_tuple)
     """ Load model for testing """
-    model = load_model("RMSprop")
-    x_train_padded, y_train, x_test_padded, y_test = load_data()
-    print(model.evaluate(x_test_padded, y_test))
+    AdamModel = load_model("Adam")
+    RMSmodel = load_model("RMSprop")
+    test_model(RMSmodel)
+    test_model(AdamModel)
     pass
