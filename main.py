@@ -9,7 +9,7 @@ import tensorflow as tf
 
 def explore_data(index=159, range_start=None, range_end=None):
     index_range = False
-    if range_start != None and range_end != None:
+    if range_start is not None and range_end is not None:
         if range_end <= range_start:
             raise TypeError("Index range end number must be greater than starting number.")
         index_range = True
@@ -130,8 +130,10 @@ if __name__ == '__main__':
     # adam_model = build_model('adam')
     # adam_scores = train_test_model(adam_model, data_tuple)
     """ Load model for testing """
+    SGDModel = load_model("SGD")
     AdamModel = load_model("Adam")
     RMSmodel = load_model("RMSprop")
+    test_model(SGDModel)
     test_model(RMSmodel)
     test_model(AdamModel)
     pass
