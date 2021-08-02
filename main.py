@@ -104,7 +104,8 @@ def load_model(mname) -> tf.keras.Sequential:
         print("Created model layers and loaded weights.")
         return model
     raise TypeError(f"Unable to load model and weights, ensure param. 'mname' is correct. "
-                    f"Attempted to load from, model_{mname}.")
+                    f"Attempted to load from, model_{mname}. Try training the models and "
+                    f"saving them, then loading and testing the newly trained saved models.")
 
 def test_model(trained_model, verbose=True):
     _, _, x_test_padded, y_test = load_data()
